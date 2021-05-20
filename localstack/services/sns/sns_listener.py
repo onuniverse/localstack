@@ -612,7 +612,7 @@ def create_sns_message_body(subscriber, req_data, message_id=None):
         'Message': message,
         'Timestamp': timestamp_millis(),
         'SignatureVersion': '1',
-        'UnsubscribeUrl': '%s/?Action=Unsubscribe&SubscriptionArn=%s' % (external_service_url('sns'), subscriber['SubscriptionArn']),
+        'UnsubscribeURL': '%s/?Action=Unsubscribe&SubscriptionArn=%s' % (external_service_url('sns'), subscriber['SubscriptionArn']),
         # TODO Add a more sophisticated solution with an actual signature
         # Hardcoded
         'Signature': 'EXAMPLEpH+..',
