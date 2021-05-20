@@ -317,8 +317,7 @@ def message_to_subscribers(message_id, message, topic_arn, req_data, headers, su
             
             try:
                 endpoint = subscriber['Endpoint']
-                external_url = external_service_url('sns')
-                subscriber['unsubscribe_url'] = '%s/?Action=Unsubscribe&SubscriptionArn=%s' % (external_url, subscriber['SubscriptionArn'])
+                
                 if 'sqs_queue_url' in subscriber:
                     queue_url = subscriber.get('sqs_queue_url')
                 elif '://' in endpoint:
@@ -588,10 +587,7 @@ def make_error(message, code=400, code_string='InvalidParameter'):
     return response
 
 
-def create_sns_message_body(subscriber, req_data, message_id=None):
-    LOG.debug(subscriber)
-    LOG.debug(req_data)
-    
+def create_sns_message_body(subscriber, req_data, message_id=None):    
     message = req_data['Message'][0]
     protocol = subscriber['Protocol']
 
@@ -616,14 +612,12 @@ def create_sns_message_body(subscriber, req_data, message_id=None):
         'Message': message,
         'Timestamp': timestamp_millis(),
         'SignatureVersion': '1',
+        'UnsubscribeUrl': '%s/?Action=Unsubscribe&SubscriptionArn=%s' % (external_service_url('sns'), subscriber['SubscriptionArn']),
         # TODO Add a more sophisticated solution with an actual signature
         # Hardcoded
         'Signature': 'EXAMPLEpH+..',
         'SigningCertURL': 'https://sns.us-east-1.amazonaws.com/SimpleNotificationService-0000000000000000000000.pem'
     }
-
-    if subscriber.get("unsubscribe_url"):
-        data["UnsubscribeUrl"] = subscriber.get("unsubscribe_url")
 
     for key in ['Subject', 'SubscribeURL', 'Token']:
         if req_data.get(key):
