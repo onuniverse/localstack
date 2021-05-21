@@ -776,8 +776,9 @@ class IAMGroup(GenericBaseModel):
         return self.props.get('GroupName')
 
     def fetch_state(self, stack_name, resources):
-        return aws_stack.connect_to_service('iam').get_group(GroupName=self.props.get('GroupName'))['Group']
-
+        group_name = self.resolve_refs_recursively(stack_name, self.props.get('GroupName'), resources)
+        
+        return aws_stack.connect_to_service('iam').get_group(GroupName=group_name)['Group']
 
 
 class IAMPolicy(GenericBaseModel):
