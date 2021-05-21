@@ -764,7 +764,20 @@ class IAMRole(GenericBaseModel, MotoRole):
     def update_resource(self, new_resource, stack_name, resources):
         props = new_resource['Properties']
         client = aws_stack.connect_to_service('iam')
-        return client.update_role(RoleName=props.get('RoleName'), Description=props.get('Description') or '')
+        return client.update(RoleName=props.get('RoleName'), Description=props.get('Description') or '')
+
+
+class IAMGroup(GenericBaseModel):
+    @staticmethod
+    def cloudformation_type():
+        return 'AWS::IAM::Group'
+
+    def get_resource_name(self):
+        return self.props.get('GroupName')
+
+    def fetch_state(self, stack_name, resources):
+        return aws_stack.connect_to_service('iam').get_group(GroupName=self.props.get('GroupName'))['Group']
+
 
 
 class IAMPolicy(GenericBaseModel):
